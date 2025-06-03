@@ -19,10 +19,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.event.RegisterShadersEvent;
-import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
+import net.neoforged.neoforge.client.event.*;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -82,6 +79,11 @@ public class ClientHandlers
         public static void shaderRegistry(RegisterShadersEvent event) throws IOException
         {
             event.registerShader(CustomRenderTypes.BRIGHT_SOLID_SHADER);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterMaterialAtlases(RegisterMaterialAtlasesEvent event) {
+            event.register(BookBakedModel.LOCATION_COVERS, ResourceLocation.fromNamespaceAndPath("gbook", "covers"));
         }
     }
 

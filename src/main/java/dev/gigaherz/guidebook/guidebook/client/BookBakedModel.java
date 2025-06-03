@@ -20,7 +20,10 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.StandardModelParameters;
 import net.neoforged.neoforge.client.model.UnbakedModelLoader;
+import net.neoforged.neoforge.client.model.obj.ObjLoader;
+import net.neoforged.neoforge.client.model.obj.ObjModel;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -29,6 +32,8 @@ import java.util.Map;
 
 public class BookBakedModel implements BakedModel
 {
+    public static final ResourceLocation LOCATION_COVERS = ResourceLocation.fromNamespaceAndPath("gbook", "textures/atlas/covers.png");
+
     private final boolean isSideLit;
     private final ItemTransforms cameraTransforms;
     private final BakedModel baseModel;
@@ -162,7 +167,7 @@ public class BookBakedModel implements BakedModel
                     BlockModel mdl = new BlockModel(
                             ResourceLocation.fromNamespaceAndPath(bookCover.getNamespace(), "generated/cover_models/" + bookCover.getPath()),
                             List.of(),
-                            new TextureSlots.Data.Builder().addTexture("cover", new Material(TextureAtlas.LOCATION_BLOCKS, bookCover)).build(),
+                            new TextureSlots.Data.Builder().addTexture("cover", new Material(LOCATION_COVERS, bookCover)).build(),
                             null, null, null);
                     //mdl.parentLocation = null;
                     mdl.parent = baseModel;
@@ -183,9 +188,21 @@ public class BookBakedModel implements BakedModel
         }
 
         private static UnbakedModel readBaseModel(
-                JsonObject childrenJsonObject,
+                JsonObject jsonObject,
                 JsonDeserializationContext context) {
-            return context.deserialize(childrenJsonObject, UnbakedModel.class);
+            String modelLocation = jsonObject.get("model").getAsString();
+
+            boolean automaticCulling = GsonHelper.getAsBoolean(jsonObject, "automatic_culling", true);
+            boolean shadeQuads = GsonHelper.getAsBoolean(jsonObject, "shade_quads", true);
+            boolean flipV = GsonHelper.getAsBoolean(jsonObject, "flip_v", false);
+            boolean emissiveAmbient = GsonHelper.getAsBoolean(jsonObject, "emissive_ambient", true);
+            String mtlOverride = GsonHelper.getAsString(jsonObject, "mtl_override", null);
+            StandardModelParameters params = StandardModelParameters.parse(jsonObject, context);
+            if (jsonObject.has("textures")) {
+                JsonObject jsonobject = GsonHelper.getAsJsonObject(jsonObject, "textures");
+                params = new StandardModelParameters(params.parent(), TextureSlots.parseTextureMap(jsonobject, LOCATION_COVERS), params.itemTransforms(), params.ambientOcclusion(), params.guiLight(), params.rootTransform(), params.renderTypeGroup(), params.partVisibility());
+            }
+            return ObjLoader.INSTANCE.loadModel(new ObjModel.ModelSettings(ResourceLocation.parse(modelLocation), automaticCulling, shadeQuads, flipV, emissiveAmbient, mtlOverride, params));
         }
     }
 }

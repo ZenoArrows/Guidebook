@@ -1,6 +1,10 @@
-
 {
   "sources": [
+    {
+      "type": "directory",
+      "source": "covers",
+      "prefix": "covers/"
+    },
     {
       "type": "single",
       "resource": "gbook:misc/cover"
