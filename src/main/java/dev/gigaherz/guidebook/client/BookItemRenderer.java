@@ -57,7 +57,7 @@ public class BookItemRenderer implements SpecialModelRenderer<BookItemRenderer.B
         bookModel.applyTransform(itemDisplayContext, poseStack, leftHand);
         poseStack.translate(-0.5D, -0.5D, -0.5D);
 
-        VertexConsumer buffer = multiBufferSource.getBuffer(NeoForgeRenderTypes.getUnsortedTranslucent(BookBakedModel.LOCATION_COVERS));
+        VertexConsumer buffer = multiBufferSource.getBuffer(ClientHandlers.layeredItemTranslucentMipped(BookBakedModel.LOCATION_COVERS));
         RandomSource rnd = RandomSource.create();
         for (Direction side : sides)
         {
