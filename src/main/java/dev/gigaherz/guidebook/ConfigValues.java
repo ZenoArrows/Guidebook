@@ -33,6 +33,7 @@ public class ConfigValues
     public static boolean flipScrollDirection = false;
     public static boolean useNaturalArrows = false;
     public static String[] giveOnFirstJoin = new String[0];
+    public static int maxCoverRes = 512;
 
     public static class ServerConfig
     {
@@ -55,6 +56,7 @@ public class ConfigValues
         public final ModConfigSpec.BooleanValue flexibleScale;
         public final ModConfigSpec.BooleanValue flipScrollDirection;
         public final ModConfigSpec.BooleanValue useNaturalArrows;
+        public final ModConfigSpec.IntValue maxCoverRes;
 
         ClientConfig(ModConfigSpec.Builder builder)
         {
@@ -74,6 +76,10 @@ public class ConfigValues
             useNaturalArrows = builder
                     .comment("If TRUE, flips the buttons on the GUI to point how the page flips, and not what direction the book advances.")
                     .define("use_natural_arrows", false);
+            maxCoverRes = builder
+                    .comment("Maximum width/height of a book cover texture, any cover image larger than this value will be downscaled.")
+                    .translation("text.guidebook.config.max_cover_res")
+                    .defineInRange("max_cover_res", 512, 16, Integer.MAX_VALUE);
             builder.pop();
         }
     }
@@ -84,6 +90,7 @@ public class ConfigValues
         flexibleScale = CLIENT.flexibleScale.get();
         flipScrollDirection = CLIENT.flipScrollDirection.get();
         useNaturalArrows = CLIENT.useNaturalArrows.get();
+        maxCoverRes = CLIENT.maxCoverRes.get();
     }
 
     public static void refreshServer()
