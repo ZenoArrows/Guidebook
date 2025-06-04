@@ -85,6 +85,11 @@ public class ClientHandlers
         public static void onRegisterMaterialAtlases(RegisterMaterialAtlasesEvent event) {
             event.register(BookBakedModel.LOCATION_COVERS, ResourceLocation.fromNamespaceAndPath("gbook", "covers"));
         }
+
+        @SubscribeEvent
+        static void onRegisterSpriteSourceTypes(RegisterSpriteSourceTypesEvent event) {
+            event.register(CoverLister.ID, CoverLister.TYPE);
+        }
     }
 
     public static RenderType brightSolid(ResourceLocation texture)
