@@ -38,43 +38,26 @@ public class BookBakedModel implements BakedModel
     private final ItemTransforms cameraTransforms;
     private final BakedModel baseModel;
     private final Map<ResourceLocation, BakedModel> bookModels;
-    private final Map<ResourceLocation, BakedModel> coverModels;
     private final TextureAtlasSprite particle;
 
     public BakedModel getActualModel(@Nullable ResourceLocation book)
     {
         if (book != null)
         {
-            BookDocument bookDocument = BookRegistry.get(book);
-            if (bookDocument != null)
-            {
-                var standaloneModel = bookDocument.getModelStandalone();
-                var cover = bookDocument.getCover();
-                if (standaloneModel != null)
-                {
-                    BakedModel bakedModel = bookModels.get(standaloneModel);
-                    if (bakedModel != null)
-                        return bakedModel;
-                }
-                else if (cover != null)
-                {
-                    BakedModel bakedModel = coverModels.get(cover);
-                    if (bakedModel != null)
-                        return bakedModel;
-                }
-            }
+            BakedModel bakedModel = bookModels.get(book);
+            if (bakedModel != null)
+                return bakedModel;
         }
         return baseModel;
     }
 
     public BookBakedModel(BakedModel baseModel,
                           boolean isSideLit, ItemTransforms cameraTransforms,
-                          Map<ResourceLocation, BakedModel> standaloneModels,
-                          Map<ResourceLocation, BakedModel> coverModels, @Nullable TextureAtlasSprite particle)
+                          Map<ResourceLocation, BakedModel> models,
+                          @Nullable TextureAtlasSprite particle)
     {
         this.baseModel = baseModel;
-        this.bookModels = standaloneModels;
-        this.coverModels = coverModels;
+        this.bookModels = models;
         this.particle = particle;
         this.isSideLit = isSideLit;
         this.cameraTransforms = cameraTransforms;
@@ -135,14 +118,12 @@ public class BookBakedModel implements BakedModel
 
             Map<ResourceLocation, BakedModel> bakedBookModels = ImmutableMap.copyOf(Maps.transformValues(bookModels,
                     v -> UnbakedModel.bakeWithTopModelValues(v, baker, modelState)));
-            Map<ResourceLocation, BakedModel> bakedCoverModels = ImmutableMap.copyOf(Maps.transformValues(coverModels,
-                    v -> UnbakedModel.bakeWithTopModelValues(v, baker, modelState)));
 
             var baseModel = UnbakedModel.bakeWithTopModelValues(this.baseModel, baker, modelState);
 
             return new BookBakedModel(
                     baseModel,
-                    usesBlockLight, itemTransforms, bakedBookModels, bakedCoverModels, part);
+                    usesBlockLight, itemTransforms, bakedBookModels, part);
         }
 
         @Override
@@ -156,19 +137,26 @@ public class BookBakedModel implements BakedModel
         {
             baseModel.resolveDependencies(resolver);
 
-            BookRegistry.gatherStandaloneBookModels().forEach((bookModel) -> {
-                bookModels.computeIfAbsent(bookModel, resolver::resolve);
-            });
+            ResourceLocation paper = ResourceLocation.fromNamespaceAndPath("gbook", "misc/paper");
+            ResourceLocation coverBase = ResourceLocation.fromNamespaceAndPath("gbook", "misc/cover");
+            BookRegistry.getLoadedBooks().forEach((resourceLocation, bookDocument) -> {
+                bookModels.computeIfAbsent(resourceLocation, (loc) -> {
+                    ResourceLocation bookCover = bookDocument.getCover();
+                    ResourceLocation bookModel = bookDocument.getModelStandalone();
+                    if (bookCover == null && bookModel == null)
+                        return baseModel;
 
-            BookRegistry.gatherBookCovers().forEach((bookCover) -> {
-                coverModels.computeIfAbsent(bookCover, (loc) -> {
                     BlockModel mdl = new BlockModel(
-                            ResourceLocation.fromNamespaceAndPath(bookCover.getNamespace(), "generated/cover_models/" + bookCover.getPath()),
+                            ResourceLocation.fromNamespaceAndPath(bookCover.getNamespace(), "generated/book_models/" + bookCover.getPath()),
                             List.of(),
-                            new TextureSlots.Data.Builder().addTexture("cover", new Material(LOCATION_COVERS, bookCover)).build(),
+                            new TextureSlots.Data.Builder()
+                                    .addTexture("cover", new Material(LOCATION_COVERS, bookCover))
+                                    .addTexture("paper", new Material(LOCATION_COVERS, paper))
+                                    .addTexture("cover_base", new Material(LOCATION_COVERS, coverBase))
+                                    .build(),
                             null, null, null);
                     //mdl.parentLocation = null;
-                    mdl.parent = baseModel;
+                    mdl.parent = bookModel == null ? baseModel : resolver.resolve(bookModel);
                     //mdl.resolveDependencies(resolver);
                     return mdl;
                 });
