@@ -3,6 +3,10 @@
   "sources": [
     {
       "type": "single",
+      "resource": "gbook:covers/default"
+    },
+    {
+      "type": "single",
       "resource": "gbook:misc/cover"
     },
     {
