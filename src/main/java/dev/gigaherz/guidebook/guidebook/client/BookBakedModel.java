@@ -141,20 +141,21 @@ public class BookBakedModel implements BakedModel
             ResourceLocation coverBase = ResourceLocation.fromNamespaceAndPath("gbook", "misc/cover");
             BookRegistry.getLoadedBooks().forEach((resourceLocation, bookDocument) -> {
                 bookModels.computeIfAbsent(resourceLocation, (loc) -> {
-                    ResourceLocation bookCover = bookDocument.getCover();
                     ResourceLocation bookModel = bookDocument.getModelStandalone();
-                    if (bookCover == null && bookModel == null)
+                    if (!bookDocument.hasCover() && bookModel == null)
                         return baseModel;
 
+                    TextureSlots.Data.Builder slots = new TextureSlots.Data.Builder();
+                    slots.addTexture("cover_base", new Material(LOCATION_COVERS, coverBase));
+                    slots.addTexture("paper", new Material(LOCATION_COVERS, paper));
+                    if (bookDocument.hasCover())
+                        bookDocument.applyCover(LOCATION_COVERS, slots);
+                    else
+                        slots.addTexture("cover", new Material(LOCATION_COVERS, coverBase));
+
                     BlockModel mdl = new BlockModel(
-                            ResourceLocation.fromNamespaceAndPath(bookCover.getNamespace(), "generated/book_models/" + bookCover.getPath()),
-                            List.of(),
-                            new TextureSlots.Data.Builder()
-                                    .addTexture("cover", new Material(LOCATION_COVERS, bookCover))
-                                    .addTexture("paper", new Material(LOCATION_COVERS, paper))
-                                    .addTexture("cover_base", new Material(LOCATION_COVERS, coverBase))
-                                    .build(),
-                            null, null, null);
+                            ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), "generated/book_models/" + loc.getPath()),
+                            List.of(), slots.build(), null, null, null);
                     //mdl.parentLocation = null;
                     mdl.parent = bookModel == null ? baseModel : resolver.resolve(bookModel);
                     //mdl.resolveDependencies(resolver);

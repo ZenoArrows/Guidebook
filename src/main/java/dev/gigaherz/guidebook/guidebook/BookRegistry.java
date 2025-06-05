@@ -375,7 +375,7 @@ public class BookRegistry
 
     public static Stream<ResourceLocation> gatherBookCovers()
     {
-        return getLoadedBooks().values().stream().map(BookDocument::getCover).filter(Objects::nonNull).distinct();
+        return getLoadedBooks().values().stream().map(BookDocument::getCover).filter(Objects::nonNull).flatMap(Collection::stream).distinct();
     }
 
     public static void initClientResourceListener(ReloadableResourceManager clientResourceManager)

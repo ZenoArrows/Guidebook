@@ -17,10 +17,9 @@ import dev.gigaherz.guidebook.guidebook.util.Point;
 import dev.gigaherz.guidebook.guidebook.util.Rect;
 import dev.gigaherz.guidebook.guidebook.util.Size;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.texture.ReloadableTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -53,7 +52,7 @@ public class BookDocument
 
     private final ResourceLocation bookLocation;
     private String bookName;
-    private ResourceLocation bookCover;
+    private Map<String, ResourceLocation> bookCover = Maps.newHashMap();
     private ResourceLocation bookModelStandalone;
 
     final List<ChapterData> chapters = Lists.newArrayList();
@@ -99,10 +98,22 @@ public class BookDocument
         return bookName;
     }
 
-    @Nullable
-    public ResourceLocation getCover()
+    public boolean hasCover()
     {
-        return bookCover;
+        return !bookCover.isEmpty();
+    }
+
+    @Nullable
+    public Collection<ResourceLocation> getCover()
+    {
+        return bookCover.values();
+    }
+
+    public void applyCover(ResourceLocation atlas, TextureSlots.Data.Builder builder)
+    {
+        bookCover.forEach((name, cover) -> {
+            builder.addTexture(name, new Material(atlas, cover));
+        });
     }
 
     @Nullable
@@ -182,7 +193,7 @@ public class BookDocument
         {
             chapters.clear();
             bookName = "";
-            bookCover = null;
+            bookCover.clear();
             fontSize = DEFAULT_FONT_SIZE;
             chaptersByName.clear();
 
@@ -219,61 +230,59 @@ public class BookDocument
             if (root.hasAttributes())
             {
                 NamedNodeMap attributes = root.getAttributes();
-                Node n = attributes.getNamedItem("title");
-                if (n != null)
+                for (int i = 0; i < attributes.getLength(); i++)
                 {
-                    bookName = n.getTextContent();
-                }
-                n = attributes.getNamedItem("cover");
-                if (n != null)
-                {
-                    bookCover = ResourceLocation.parse(n.getTextContent());
-                }
-                n = attributes.getNamedItem("model");
-                if (n != null)
-                {
-                    var text = n.getTextContent();
-                    if (text.contains("#"))
+                    Node n = attributes.item(i);
+                    switch (n.getNodeName())
                     {
-                        var parts = text.split("#");
-                        var loc = ResourceLocation.parse(parts[0]);
-                        var variant = parts[1];
-                        if (!Objects.equals(variant, "inventory"))
-                            throw new RuntimeException("Not supported");
-                        bookModelStandalone = loc;
-                    }
-                    else
-                    {
-                        bookModelStandalone = ResourceLocation.parse(text);
-                    }
-                }
-                n = attributes.getNamedItem("background");
-                if (n != null)
-                {
-                    background = ResourceLocation.parse(n.getTextContent());
-                }
-                n = attributes.getNamedItem("fontSize");
-                if (n != null)
-                {
-                    Float f = Floats.tryParse(n.getTextContent());
-                    fontSize = f != null ? f : DEFAULT_FONT_SIZE;
-                }
-                n = attributes.getNamedItem("home");
-                if (n != null)
-                {
-                    String ref = n.getTextContent();
-                    home = SectionRef.fromString(ref);
-                }
-                n = attributes.getNamedItem("dependencies");
-                if (n != null)
-                {
-                    for (String s : n.getTextContent().split(","))
-                    {
-                        if (!ModList.get().isLoaded(s))
-                        {
-                            initializeWithLoadError("Dependency not loaded: " + s);
-                            return false;
-                        }
+                        case "xmlns":
+                        case "xmlns:minecraft":
+                            break;
+                        case "title":
+                            bookName = n.getTextContent();
+                            break;
+                        case "model":
+                            var text = n.getTextContent();
+                            if (text.contains("#"))
+                            {
+                                var parts = text.split("#");
+                                var loc = ResourceLocation.parse(parts[0]);
+                                var variant = parts[1];
+                                if (!Objects.equals(variant, "inventory"))
+                                    throw new RuntimeException("Not supported");
+                                bookModelStandalone = loc;
+                            }
+                            else
+                            {
+                                bookModelStandalone = ResourceLocation.parse(text);
+                            }
+                            break;
+                        case "background":
+                            background = ResourceLocation.parse(n.getTextContent());
+                            break;
+                        case "fontSize":
+                            Float f = Floats.tryParse(n.getTextContent());
+                            fontSize = f != null ? f : DEFAULT_FONT_SIZE;
+                            break;
+                        case "home":
+                            String ref = n.getTextContent();
+                            home = SectionRef.fromString(ref);
+                            break;
+                        case "dependencies":
+                            for (String s : n.getTextContent().split(","))
+                            {
+                                if (!ModList.get().isLoaded(s))
+                                {
+                                    initializeWithLoadError("Dependency not loaded: " + s);
+                                    return false;
+                                }
+                            }
+                            break;
+                        default:
+                            String res = n.getTextContent();
+                            if (res.indexOf(':') >= 0)
+                                bookCover.put(n.getNodeName(), ResourceLocation.parse(n.getTextContent()));
+                            break;
                     }
                 }
             }
