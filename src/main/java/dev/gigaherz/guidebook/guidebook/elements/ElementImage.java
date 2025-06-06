@@ -34,12 +34,12 @@ public class ElementImage extends ElementInline
 
     private float getVisualScale()
     {
-        int width = (w > 0 ? w : tw);
-        int height = (h > 0 ? h : th);
-
         // Prevent the image from overflowing the book
-        float scaleFit = Math.min(BookRendering.DEFAULT_BOOK_WIDTH / (float)width,
-                BookRendering.DEFAULT_PAGE_HEIGHT / (float)height);
+        float width = w > 0 ? w : tw;
+        float height = h > 0 ? h : th;
+        float pageWidth = width > height ? BookRendering.DEFAULT_BOOK_WIDTH : BookRendering.DEFAULT_PAGE_WIDTH;
+        float pageHeight = BookRendering.DEFAULT_PAGE_HEIGHT;
+        float scaleFit = width / height > pageWidth / pageHeight ? pageWidth / width : pageHeight / height;
         return Math.min(scale, scaleFit);
     }
 
