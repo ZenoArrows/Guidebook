@@ -356,6 +356,11 @@ public class BookRendering implements IBookGraphics
         {
             navigateTo(book.home);
         }
+        else
+        {
+            currentChapter = 0;
+            currentPair = 0;
+        }
     }
 
     private int getNextChapter()
