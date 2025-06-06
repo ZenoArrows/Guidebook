@@ -160,15 +160,31 @@ public class GuidebookScreen extends Screen
     @Override
     public boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_)
     {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE)
+        switch(keyCode)
         {
-            background.startClosing();
-            return true;
-        }
-        else if (keyCode == GLFW.GLFW_KEY_BACKSPACE)
-        {
-            rendering.navigateBack();
-            return true;
+            case GLFW.GLFW_KEY_ESCAPE:
+                background.startClosing();
+                return true;
+            case GLFW.GLFW_KEY_BACKSPACE:
+                rendering.navigateBack();
+                return true;
+            case GLFW.GLFW_KEY_HOME:
+                rendering.navigateHome();
+                return true;
+            case GLFW.GLFW_KEY_LEFT:
+            case GLFW.GLFW_KEY_PAGE_UP:
+                rendering.prevPage();
+                return true;
+            case GLFW.GLFW_KEY_RIGHT:
+            case GLFW.GLFW_KEY_PAGE_DOWN:
+                rendering.nextPage();
+                return true;
+            case GLFW.GLFW_KEY_UP:
+                rendering.prevChapter();
+                return true;
+            case GLFW.GLFW_KEY_DOWN:
+                rendering.nextChapter();
+                return true;
         }
 
         return super.keyPressed(keyCode, p_keyPressed_2_, p_keyPressed_3_);
