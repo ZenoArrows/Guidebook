@@ -805,13 +805,13 @@ public class BookRendering implements IBookGraphics
     @Override
     public int getActualBookHeight()
     {
-        return bookHeight;
+        return bookHeight - (topMargin + bottomMargin);
     }
 
     @Override
     public int getActualBookWidth()
     {
-        return bookWidth;
+        return bookWidth - 2 * outerMargin;
     }
 
     public void setGui(GuidebookScreen guidebookScreen)

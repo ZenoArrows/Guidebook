@@ -1029,7 +1029,7 @@ public class BookDocument
                 if (!Strings.isNullOrEmpty(section.id))
                     ch.pagesByName.put(section.id, ch.pages.size());
 
-                ch.pages.addAll(section.reflow(rendering, pageSize));
+                ch.pages.addAll(section.reflow(rendering, pageSize, ch.pages.size() + 1));
             }
         }
 
@@ -1053,8 +1053,10 @@ public class BookDocument
             this.ref = ref;
         }
 
-        public List<VisualPage> reflow(IBookGraphics rendering, Size pageSize)
+        public List<VisualPage> reflow(IBookGraphics rendering, Size pageSize, int pageNumber)
         {
+            List<VisualPage> pages = Lists.newArrayList();
+
             VisualPage page = new VisualPage(ref);
             Rect pageBounds = new Rect(new Point(), pageSize);
 
@@ -1073,7 +1075,39 @@ public class BookDocument
                     top = element.reflow(page.children, rendering, new Rect(new Point(0, top), pageSize), pageBounds);
             }
 
-            return Collections.singletonList(page);
+            boolean needsRepagination = false;
+            for (VisualElement child : page.children)
+            {
+                if (child.size.width() > rendering.getActualBookWidth() / 2)
+                {
+                    needsRepagination = true;
+                    break;
+                }
+            }
+
+            if (needsRepagination)
+            {
+                for (VisualElement child : page.children)
+                {
+                    if (child.size.width() > rendering.getActualBookWidth() / 2)
+                    {
+                        if ((pageNumber & 1) == 0)
+                            pages.add(new VisualPage(ref));
+
+                        pages.add(page);
+                        pages.add(new VisualPage(ref));
+
+                        int offsetX = (rendering.getActualBookWidth() - child.size.width()) / 2;
+                        child.position = new Point(offsetX, child.position.y());
+                    }
+                }
+            }
+            else
+            {
+                pages.add(page);
+            }
+
+            return pages;
         }
 
         public boolean reevaluateConditions(ConditionContext ctx)
@@ -1123,7 +1157,7 @@ public class BookDocument
         }
 
         @Override
-        public List<VisualPage> reflow(IBookGraphics rendering, Size pageSize)
+        public List<VisualPage> reflow(IBookGraphics rendering, Size pageSize, int pageNumber)
         {
             List<VisualPage> pages = Lists.newArrayList();
 

@@ -37,8 +37,8 @@ public class ElementImage extends ElementInline
         int width = (w > 0 ? w : tw);
         int height = (h > 0 ? h : th);
 
-        // Prevent the image from overflowing the page
-        float scaleFit = Math.min(BookRendering.DEFAULT_PAGE_WIDTH / (float)width,
+        // Prevent the image from overflowing the book
+        float scaleFit = Math.min(BookRendering.DEFAULT_BOOK_WIDTH / (float)width,
                 BookRendering.DEFAULT_PAGE_HEIGHT / (float)height);
         return Math.min(scale, scaleFit);
     }
