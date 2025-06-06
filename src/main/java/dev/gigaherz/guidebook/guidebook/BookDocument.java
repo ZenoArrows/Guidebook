@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Floats;
 import dev.gigaherz.guidebook.GuidebookMod;
+import dev.gigaherz.guidebook.guidebook.client.BookRendering;
 import dev.gigaherz.guidebook.guidebook.conditions.ConditionContext;
 import dev.gigaherz.guidebook.guidebook.conditions.ConditionManager;
 import dev.gigaherz.guidebook.guidebook.drawing.*;
@@ -1080,8 +1081,15 @@ public class BookDocument
             {
                 if (child.size.width() > rendering.getActualBookWidth() / 2)
                 {
+                    int offsetX = (rendering.getActualBookWidth() - child.size.width()) / 2;
+                    child.position = new Point(offsetX, child.position.y());
+
                     needsRepagination = true;
-                    break;
+                }
+                else
+                {
+                    int offsetX = (BookRendering.DEFAULT_PAGE_WIDTH - child.size.width()) / 2;
+                    child.position = new Point(offsetX, child.position.y());
                 }
             }
 
@@ -1096,9 +1104,6 @@ public class BookDocument
 
                         pages.add(page);
                         pages.add(new VisualPage(ref));
-
-                        int offsetX = (rendering.getActualBookWidth() - child.size.width()) / 2;
-                        child.position = new Point(offsetX, child.position.y());
                     }
                 }
             }
