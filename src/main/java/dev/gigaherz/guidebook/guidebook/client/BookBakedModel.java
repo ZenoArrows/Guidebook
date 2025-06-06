@@ -3,15 +3,10 @@ package dev.gigaherz.guidebook.guidebook.client;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.mojang.datafixers.util.Either;
-import dev.gigaherz.guidebook.guidebook.BookDocument;
 import dev.gigaherz.guidebook.guidebook.BookRegistry;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
@@ -104,7 +99,6 @@ public class BookBakedModel implements BakedModel
     {
         private final UnbakedModel baseModel;
         private final Map<ResourceLocation, UnbakedModel> bookModels = Maps.newHashMap();
-        private final Map<ResourceLocation, UnbakedModel> coverModels = Maps.newHashMap();
 
         public Model(UnbakedModel baseModel)
         {
@@ -142,22 +136,21 @@ public class BookBakedModel implements BakedModel
             BookRegistry.getLoadedBooks().forEach((resourceLocation, bookDocument) -> {
                 bookModels.computeIfAbsent(resourceLocation, (loc) -> {
                     ResourceLocation bookModel = bookDocument.getModelStandalone();
-                    if (!bookDocument.hasCover() && bookModel == null)
-                        return baseModel;
+                    UnbakedModel parent = bookModel == null ? baseModel : resolver.resolve(bookModel);
+                    if (!bookDocument.hasCover())
+                        return parent;
 
                     TextureSlots.Data.Builder slots = new TextureSlots.Data.Builder();
                     slots.addTexture("cover_base", new Material(LOCATION_COVERS, coverBase));
                     slots.addTexture("paper", new Material(LOCATION_COVERS, paper));
                     if (bookDocument.hasCover())
                         bookDocument.applyCover(LOCATION_COVERS, slots);
-                    else
-                        slots.addTexture("cover", new Material(LOCATION_COVERS, coverBase));
 
                     BlockModel mdl = new BlockModel(
                             ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), "generated/book_models/" + loc.getPath()),
                             List.of(), slots.build(), null, null, null);
                     //mdl.parentLocation = null;
-                    mdl.parent = bookModel == null ? baseModel : resolver.resolve(bookModel);
+                    mdl.parent = parent;
                     //mdl.resolveDependencies(resolver);
                     return mdl;
                 });
