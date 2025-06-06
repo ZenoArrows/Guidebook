@@ -41,15 +41,15 @@ import java.util.function.Consumer;
 
 public class BookRendering implements IBookGraphics
 {
-    public static final int DEFAULT_INNER_MARGIN = 12;
-    public static final int DEFAULT_OUTER_MARGIN = 10;
+    public static final int DEFAULT_INNER_MARGIN = 10;
+    public static final int DEFAULT_OUTER_MARGIN = 5;
     public static final int DEFAULT_TOP_MARGIN = 12;
-    public static final int DEFAULT_BOTTOM_MARGIN = 16;
+    public static final int DEFAULT_BOTTOM_MARGIN = 10;
     public static final int DEFAULT_BOOK_WIDTH = 308 + DEFAULT_OUTER_MARGIN*2;
     public static final int DEFAULT_BOOK_HEIGHT = 192 + DEFAULT_TOP_MARGIN + DEFAULT_BOTTOM_MARGIN;
     public static final int DEFAULT_PAGE_WIDTH = DEFAULT_BOOK_WIDTH / 2 - DEFAULT_INNER_MARGIN - DEFAULT_OUTER_MARGIN;
     public static final int DEFAULT_PAGE_HEIGHT = DEFAULT_BOOK_HEIGHT - DEFAULT_TOP_MARGIN - DEFAULT_BOTTOM_MARGIN;
-    public static final int BOOK_SCALE_MARGIN = 0;
+    public static final int BOOK_SCALE_MARGIN = 10;
 
     private final Minecraft mc = Minecraft.getInstance();
     private GuidebookScreen gui;
@@ -712,7 +712,7 @@ public class BookRendering implements IBookGraphics
         Component cnt = Component.literal(String.valueOf(ch.startPair * 2 + page + 1));
         Size sz = measure(cnt);
 
-        addString(graphics, (pageWidth - sz.width()) / 2, pageHeight + 8, cnt, 0xFF000000, 1.0f);
+        addString(graphics, (pageWidth - sz.width()) / 2, pageHeight + 4, cnt, 0xFF000000, 0.5f);
 
         pose.popPose();
     }
