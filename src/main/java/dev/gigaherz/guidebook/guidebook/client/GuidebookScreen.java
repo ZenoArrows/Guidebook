@@ -138,10 +138,20 @@ public class GuidebookScreen extends Screen
         buttonClose.visible = background.isFullyOpen();
         buttonHome.visible = background.isFullyOpen() && rendering.getBook().home != null;
         buttonBack.visible = background.isFullyOpen() && rendering.canGoBack();
-        buttonNextPage.visible = background.isFullyOpen() && rendering.canGoNextPage();
-        buttonPreviousPage.visible = background.isFullyOpen() && rendering.canGoPrevPage();
-        buttonNextChapter.visible = background.isFullyOpen() && rendering.canGoNextChapter();
-        buttonPreviousChapter.visible = background.isFullyOpen() && rendering.canGoPrevChapter();
+        if (rendering.getBook().isRightToLeft())
+        {
+            buttonPreviousPage.visible = background.isFullyOpen() && rendering.canGoNextPage();
+            buttonNextPage.visible = background.isFullyOpen() && rendering.canGoPrevPage();
+            buttonPreviousChapter.visible = background.isFullyOpen() && rendering.canGoNextChapter();
+            buttonNextChapter.visible = background.isFullyOpen() && rendering.canGoPrevChapter();
+        }
+        else
+        {
+            buttonNextPage.visible = background.isFullyOpen() && rendering.canGoNextPage();
+            buttonPreviousPage.visible = background.isFullyOpen() && rendering.canGoPrevPage();
+            buttonNextChapter.visible = background.isFullyOpen() && rendering.canGoNextChapter();
+            buttonPreviousChapter.visible = background.isFullyOpen() && rendering.canGoPrevChapter();
+        }
     }
 
     @Override
@@ -176,11 +186,17 @@ public class GuidebookScreen extends Screen
                 return true;
             case GLFW.GLFW_KEY_LEFT:
             case GLFW.GLFW_KEY_PAGE_UP:
-                rendering.prevPage();
+                if (rendering.getBook().isRightToLeft())
+                    rendering.nextPage();
+                else
+                    rendering.prevPage();
                 return true;
             case GLFW.GLFW_KEY_RIGHT:
             case GLFW.GLFW_KEY_PAGE_DOWN:
-                rendering.nextPage();
+                if (rendering.getBook().isRightToLeft())
+                    rendering.prevPage();
+                else
+                    rendering.nextPage();
                 return true;
             case GLFW.GLFW_KEY_UP:
                 rendering.prevChapter();
@@ -308,25 +324,37 @@ public class GuidebookScreen extends Screen
 
     private void onPrevPageClicked(Button btn)
     {
-        rendering.prevPage();
+        if (rendering.getBook().isRightToLeft())
+            rendering.nextPage();
+        else
+            rendering.prevPage();
         updateButtonStates();
     }
 
     private void onNextPageClicked(Button btn)
     {
-        rendering.nextPage();
+        if (rendering.getBook().isRightToLeft())
+            rendering.prevPage();
+        else
+            rendering.nextPage();
         updateButtonStates();
     }
 
     private void onPrevChapterClicked(Button btn)
     {
-        rendering.prevChapter();
+        if (rendering.getBook().isRightToLeft())
+            rendering.nextChapter();
+        else
+            rendering.prevChapter();
         updateButtonStates();
     }
 
     private void onNextChapterClicked(Button btn)
     {
-        rendering.nextChapter();
+        if (rendering.getBook().isRightToLeft())
+            rendering.prevChapter();
+        else
+            rendering.nextChapter();
         updateButtonStates();
     }
 

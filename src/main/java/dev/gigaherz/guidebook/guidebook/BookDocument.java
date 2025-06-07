@@ -53,6 +53,7 @@ public class BookDocument
 
     private final ResourceLocation bookLocation;
     private String bookName;
+    private boolean rightToLeft;
     private Map<String, ResourceLocation> bookCover = Maps.newHashMap();
     private ResourceLocation bookModelStandalone;
 
@@ -97,6 +98,11 @@ public class BookDocument
     public String getName()
     {
         return bookName;
+    }
+
+    public boolean isRightToLeft()
+    {
+        return rightToLeft;
     }
 
     public boolean hasCover()
@@ -194,6 +200,7 @@ public class BookDocument
         {
             chapters.clear();
             bookName = "";
+            rightToLeft = false;
             bookCover.clear();
             fontSize = DEFAULT_FONT_SIZE;
             chaptersByName.clear();
@@ -241,6 +248,11 @@ public class BookDocument
                             break;
                         case "title":
                             bookName = n.getTextContent();
+                            break;
+                        case "direction":
+                            var direction = n.getTextContent();
+                            rightToLeft = direction.equalsIgnoreCase("rtl") ||
+                                    direction.equalsIgnoreCase("rightToLeft");
                             break;
                         case "model":
                             var text = n.getTextContent();
@@ -1050,7 +1062,7 @@ public class BookDocument
         }
     }
 
-    public static class PageData
+    public class PageData
     {
         public final SectionRef ref;
         public String id;
@@ -1112,8 +1124,16 @@ public class BookDocument
                         if ((pageNumber & 1) == 0)
                             pages.add(new VisualPage(ref));
 
-                        pages.add(page);
-                        pages.add(new VisualPage(ref));
+                        if (isRightToLeft())
+                        {
+                            pages.add(new VisualPage(ref));
+                            pages.add(page);
+                        }
+                        else
+                        {
+                            pages.add(page);
+                            pages.add(new VisualPage(ref));
+                        }
                     }
                 }
             }
@@ -1164,7 +1184,7 @@ public class BookDocument
      * </chapter>
      * </book>
      */
-    public static class PageGroup extends PageData
+    public class PageGroup extends PageData
     {
         public PageGroup(SectionRef ref)
         {

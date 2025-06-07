@@ -683,7 +683,9 @@ public class BookRendering implements IBookGraphics
         double right = left + pageWidth + innerMargin * 2;
         double top = (scaledHeight - bookHeight) / 2 + topMargin;
 
-        return new PointD(leftPage ? left : right, top);
+        return book.isRightToLeft() ?
+                new PointD(leftPage ? right : left, top) :
+                new PointD(leftPage ? left : right, top);
     }
 
     private void drawPage(GuiGraphics graphics, int page)
