@@ -69,6 +69,8 @@ public class GuidebookScreen extends Screen
         if (rendering == null)
         {
             BookDocument theBook = BookRegistry.get(bookLocation);
+            if (player.isShiftKeyDown())
+                BookRegistry.refresh(theBook);
             theBook.findTextures(textures);
             for (Map.Entry<ResourceLocation, ReloadableTexture> texture : textures.entrySet())
             {

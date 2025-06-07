@@ -117,8 +117,8 @@ public class BookRegistry
         {
             if (!LOADED_BOOKS.containsKey(loc))
             {
-                BookDocument book = parseBook(manager, loc, lang);
-                if (book != null)
+                BookDocument book = new BookDocument(loc);
+                if (parseBook(manager, book, lang))
                     LOADED_BOOKS.put(loc, book);
             }
         }
@@ -138,9 +138,8 @@ public class BookRegistry
     }
 
     @Nullable
-    private static BookDocument parseBook(ResourceManager manager, ResourceLocation location, String lang)
+    private static boolean parseBook(ResourceManager manager, BookDocument bookDocument, String lang)
     {
-        BookDocument bookDocument = new BookDocument(location);
         try
         {
             ResourceLocation bookLocation = bookDocument.getLocation();
@@ -175,31 +174,46 @@ public class BookRegistry
             try (InputStream stream = bookResource.open())
             {
                 if (!bookDocument.parseBook(stream, false))
-                    return null;
+                    return false;
             }
         }
         catch (IOException e)
         {
             bookDocument.initializeWithLoadError(e.toString());
         }
-        return bookDocument;
+        return true;
     }
 
     @Nullable
-    private static BookDocument parseBook(ResourceLocation location, File file)
+    private static boolean parseBook(BookDocument bookDocument, File file)
     {
-        BookDocument bookDocument = new BookDocument(location);
         try
         {
             InputStream stream = new FileInputStream(file);
             if (!bookDocument.parseBook(stream, true))
-                return null;
+                return false;
         }
         catch (Exception e)
         {
             bookDocument.initializeWithLoadError(e.toString());
         }
-        return bookDocument;
+        return true;
+    }
+
+    public static boolean refresh(BookDocument book)
+    {
+        ResourceLocation loc = book.getLocation();
+        File booksFolder = getBooksFolder();
+        if (booksFolder != null && loc != null)
+        {
+            String path = loc.getPath();
+            File file = new File(booksFolder, path);
+            if (file.exists())
+                return parseBook(book, file);
+        }
+
+        var lang = Minecraft.getInstance().getLanguageManager().getSelected();
+        return parseBook(Minecraft.getInstance().getResourceManager(), book, lang);
     }
 
     private static void loadRawBookFiles()
@@ -218,8 +232,8 @@ public class BookRegistry
 
                 if (!LOADED_BOOKS.containsKey(loc))
                 {
-                    BookDocument book = parseBook(loc, f);
-                    if (book != null)
+                    BookDocument book = new BookDocument(loc);
+                    if (parseBook(book, f))
                         LOADED_BOOKS.put(loc, book);
                 }
             }
