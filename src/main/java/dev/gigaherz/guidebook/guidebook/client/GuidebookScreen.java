@@ -8,6 +8,7 @@ import dev.gigaherz.guidebook.guidebook.conditions.ConditionContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
@@ -279,7 +280,10 @@ public class GuidebookScreen extends Screen
     public boolean mouseClicked(double x, double y, int mouseButton)
     {
         if (rendering.mouseClicked((int) x, (int) y, mouseButton))
+        {
+            AbstractWidget.playButtonClickSound(Minecraft.getInstance().getSoundManager());
             return true;
+        }
 
         if (mouseButton == 3)
         {
