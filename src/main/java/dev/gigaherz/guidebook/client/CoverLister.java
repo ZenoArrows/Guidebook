@@ -7,6 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.guidebook.ConfigValues;
 import dev.gigaherz.guidebook.GuidebookMod;
 import dev.gigaherz.guidebook.guidebook.BookRegistry;
+import dev.gigaherz.guidebook.guidebook.util.OptionalExtensionConverter;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
@@ -24,6 +25,7 @@ import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public record CoverLister(Optional<String> idPrefix) implements SpriteSource {
+    private static final OptionalExtensionConverter TEXTURE_ID_CONVERTER = new OptionalExtensionConverter("textures", ".png");
 
     private static final MapCodec<CoverLister> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             Codec.STRING.optionalFieldOf("prefix").forGetter(lister -> lister.idPrefix)).apply(inst, CoverLister::new));

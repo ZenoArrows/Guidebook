@@ -7,6 +7,7 @@ import dev.gigaherz.guidebook.guidebook.client.MipmappedTexture;
 import dev.gigaherz.guidebook.guidebook.drawing.VisualElement;
 import dev.gigaherz.guidebook.guidebook.drawing.VisualImage;
 import dev.gigaherz.guidebook.guidebook.util.AttributeGetter;
+import dev.gigaherz.guidebook.guidebook.util.OptionalExtensionConverter;
 import dev.gigaherz.guidebook.guidebook.util.Rect;
 import dev.gigaherz.guidebook.guidebook.util.Size;
 import net.minecraft.client.renderer.texture.ReloadableTexture;
@@ -19,6 +20,8 @@ import java.util.Map;
 
 public class ElementImage extends ElementInline
 {
+    private static final OptionalExtensionConverter TEXTURE_ID_CONVERTER = new OptionalExtensionConverter("textures", ".png");
+
     public ResourceLocation textureLocation;
     public int tx = 0;
     public int ty = 0;
@@ -75,8 +78,7 @@ public class ElementImage extends ElementInline
     @Override
     public void findTextures(Map<ResourceLocation, ReloadableTexture> textures)
     {
-        String path = textureLocation.getPath().indexOf('.') > 0 ? textureLocation.getPath() : textureLocation.getPath() + ".png";
-        ResourceLocation expandedLocation = ResourceLocation.fromNamespaceAndPath(textureLocation.getNamespace(), "textures/" + path);
+        ResourceLocation expandedLocation = TEXTURE_ID_CONVERTER.idToFile(textureLocation);
         textures.put(textureLocation, tw > 256 || th > 256 ? new MipmappedTexture(expandedLocation) : new SimpleTexture(expandedLocation));
     }
 
