@@ -4,6 +4,7 @@
   "package": "dev.gigaherz.guidebook.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "MixinBlockModel"
+    "MixinBlockModel",
+    "MixinNativeImage"
   ]
 }
