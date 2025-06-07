@@ -674,8 +674,7 @@ public class BookDocument
         }
         else if (nodeName.equals("space")
                 || nodeName.equals("group")
-                || nodeName.equals("panel")
-                || nodeName.equals("div"))
+                || nodeName.equals("panel"))
         {
             ElementPanel p = new ElementPanel();
 
@@ -855,6 +854,17 @@ public class BookDocument
         else if (nodeName.equals("image"))
         {
             ElementImage i = new ElementImage(isFirstElement, isLastElement);
+
+            if (elementItem.hasAttributes())
+            {
+                i.parse(context, AttributeGetter.of(elementItem));
+            }
+
+            parsedElement = i;
+        }
+        else if (nodeName.equals("box") || nodeName.equals("div"))
+        {
+            ElementBox i = new ElementBox(isFirstElement, isLastElement);
 
             if (elementItem.hasAttributes())
             {
