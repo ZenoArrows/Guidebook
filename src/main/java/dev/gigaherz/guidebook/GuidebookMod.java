@@ -48,10 +48,9 @@ public class GuidebookMod
                     .icon(() -> new ItemStack(bookItem()))
                     .title(Component.translatable("itemGroup.gbook"))
                     .displayItems((featureFlags, output) -> {
-                        for (ResourceLocation resourceLocation : BookRegistry.getBooksList())
-                        {
-                            output.accept(bookItem() .of(resourceLocation));
-                        }
+                        BookRegistry.getBooksList().stream().sorted(ResourceLocation::compareNamespaced).forEach((book) -> {
+                            output.accept(bookItem().of(book));
+                        });
                     }).build());
 
     public static final Logger logger = LogManager.getLogger(MODID);
