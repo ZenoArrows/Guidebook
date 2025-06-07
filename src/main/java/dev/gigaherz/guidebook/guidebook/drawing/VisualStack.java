@@ -120,10 +120,11 @@ public class VisualStack extends VisualElement
     }
 
     @Override
-    public void click(IBookGraphics nav)
+    public boolean click(IBookGraphics nav)
     {
         SectionRef ref = nav.getBook().getStackLink(getCurrentStack());
         if (ref != null)
             nav.navigateTo(ref);
+        return ref != null;
     }
 }

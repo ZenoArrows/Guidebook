@@ -573,8 +573,8 @@ public class BookRendering implements IBookGraphics
             if (mX >= e.position.x() && mX <= (e.position.x() + e.size.width()) &&
                     mY >= e.position.y() && mY <= (e.position.y() + e.size.height()))
             {
-                e.click(this);
-                return true;
+                if (e.click(this))
+                    return true;
             }
         }
         return false;

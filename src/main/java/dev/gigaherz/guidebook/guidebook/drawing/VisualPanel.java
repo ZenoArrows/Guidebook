@@ -76,10 +76,10 @@ public class VisualPanel extends VisualElement
     }
 
     @Override
-    public void click(IBookGraphics nav)
+    public boolean click(IBookGraphics nav)
     {
         super.click(nav);
-        children.forEach(e -> e.click(nav));
+        return children.stream().anyMatch(e -> e.click(nav));
     }
 
     @Override

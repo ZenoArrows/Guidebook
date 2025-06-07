@@ -64,8 +64,9 @@ public abstract class VisualElement extends Rect
     {
     }
 
-    public void click(IBookGraphics nav)
+    public boolean click(IBookGraphics nav)
     {
+        return false;
     }
 
     public boolean wantsHover()

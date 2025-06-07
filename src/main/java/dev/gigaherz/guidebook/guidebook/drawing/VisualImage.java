@@ -70,10 +70,11 @@ public class VisualImage extends VisualElement implements LinkHelper.ILinkable
     }
 
     @Override
-    public void click(IBookGraphics nav)
+    public boolean click(IBookGraphics nav)
     {
         if (linkContext != null)
             LinkHelper.click(nav, linkContext);
+        return linkContext != null;
     }
 
     @Override
