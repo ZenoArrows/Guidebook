@@ -131,7 +131,10 @@ public class GuidebookScreen extends Screen
         super.tick();
 
         if (background.update())
+        {
             minecraft.setScreen(null);
+            rendering.releaseTextures();
+        }
 
         updateButtonStates();
     }

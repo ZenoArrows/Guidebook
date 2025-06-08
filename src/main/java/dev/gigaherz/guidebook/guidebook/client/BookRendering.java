@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.gigaherz.guidebook.ConfigValues;
+import dev.gigaherz.guidebook.client.ClientHandlers;
 import dev.gigaherz.guidebook.guidebook.BookDocument;
 import dev.gigaherz.guidebook.guidebook.HoverContext;
 import dev.gigaherz.guidebook.guidebook.IBookGraphics;
@@ -19,6 +20,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -30,6 +33,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +55,7 @@ public class BookRendering implements IBookGraphics
     private GuidebookScreen gui;
 
     private BookDocument book;
+    private Map<ResourceLocation, AbstractTexture> textures = new HashMap();
 
     private boolean hasScale;
     private float scalingFactor;
@@ -106,6 +111,15 @@ public class BookRendering implements IBookGraphics
     public Level getWorld()
     {
         return Objects.requireNonNull(mc.level);
+    }
+
+    @Override
+    public void releaseTextures()
+    {
+        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        for (ResourceLocation texture : textures.keySet())
+            textureManager.release(texture);
+        textures.clear();
     }
 
     @Override
@@ -744,12 +758,30 @@ public class BookRendering implements IBookGraphics
         ResourceLocation locExpanded = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), "textures/" + path);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, locExpanded);
+
+        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        boolean hires = sw > 256 || sh > 256;
+        AbstractTexture texture = textures.get(locExpanded);
+        if (texture == null)
+        {
+            if (hires)
+            {
+                MipmappedTexture mipmappedTexture = new MipmappedTexture(locExpanded);
+                textureManager.registerAndLoad(locExpanded, mipmappedTexture);
+                texture = mipmappedTexture;
+            }
+            else
+            {
+                texture = textureManager.getTexture(locExpanded);
+            }
+            textures.put(locExpanded, texture);
+        }
+        RenderSystem.setShaderTexture(0, texture.getId());
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        drawFlexible(locExpanded, graphics.pose(), x, y, tx, ty, w, h, sw, sh, scale);
+        drawFlexible(locExpanded, graphics.pose(), x, y, tx, ty, w, h, sw, sh, scale, hires);
     }
 
     @Override
@@ -758,14 +790,14 @@ public class BookRendering implements IBookGraphics
         return gui.getFontRenderer();
     }
 
-    private static void drawFlexible(ResourceLocation locExpanded, PoseStack matrixStack, int x, int y, float tx, float ty, int w, int h, int tw, int th, float scale)
+    private static void drawFlexible(ResourceLocation locExpanded, PoseStack matrixStack, int x, int y, float tx, float ty, int w, int h, int tw, int th, float scale, boolean mipmapped)
     {
-        drawFlexible(locExpanded, matrixStack.last().pose(), x, y, tx, ty, w, h, tw, th, scale);
+        drawFlexible(locExpanded, matrixStack.last().pose(), x, y, tx, ty, w, h, tw, th, scale, mipmapped);
     }
 
-    private static void drawFlexible(ResourceLocation locExpanded, Matrix4f matrix, int x, int y, float tx, float ty, int w, int h, int tw, int th, float scale)
+    private static void drawFlexible(ResourceLocation locExpanded, Matrix4f matrix, int x, int y, float tx, float ty, int w, int h, int tw, int th, float scale, boolean mipmapped)
     {
-        RenderType rendertype = RenderType.guiTextured(locExpanded);
+        RenderType rendertype = mipmapped ? ClientHandlers.guiMipmapped(locExpanded) : RenderType.guiTextured(locExpanded);
         VertexConsumer consumer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(rendertype);
         float hs = h * scale;
         float ws = w * scale;

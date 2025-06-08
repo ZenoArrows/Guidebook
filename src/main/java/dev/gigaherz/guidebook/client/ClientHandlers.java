@@ -90,6 +90,11 @@ public class ClientHandlers
         return CustomRenderTypes.BRIGHT_SOLID.apply(texture);
     }
 
+    public static RenderType guiMipmapped(ResourceLocation texture)
+    {
+        return CustomRenderTypes.GUI_MIPMAPPED.apply(texture);
+    }
+
     private static class CustomRenderTypes extends RenderType
     {
         public static final ResourceLocation BRIGHT_SOLID_SHADER_LOCATION = ResourceLocation.fromNamespaceAndPath("gbook", "core/rendertype_bright_solid");
@@ -116,6 +121,19 @@ public class ClientHandlers
                     .setOverlayState(NO_OVERLAY)
                     .createCompositeState(true);
             return create("gbook_bright_solid", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, false, rendertype$state);
+        }
+
+        public static Function<ResourceLocation, RenderType> GUI_MIPMAPPED = Util.memoize(CustomRenderTypes::guiMipmapped);
+
+        private static RenderType guiMipmapped(ResourceLocation locationIn)
+        {
+            RenderType.CompositeState rendertype$state = RenderType.CompositeState.builder()
+                    .setTextureState(new RenderStateShard.TextureStateShard(locationIn, TriState.TRUE, true))
+                    .setShaderState(POSITION_TEXTURE_COLOR_SHADER)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .createCompositeState(false);
+            return create("gbook_gui_mipmapped", DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 786432, rendertype$state);
         }
     }
 }
