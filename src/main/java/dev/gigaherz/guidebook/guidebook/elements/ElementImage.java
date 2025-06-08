@@ -2,6 +2,7 @@ package dev.gigaherz.guidebook.guidebook.elements;
 
 import dev.gigaherz.guidebook.guidebook.IBookGraphics;
 import dev.gigaherz.guidebook.guidebook.ParsingContext;
+import dev.gigaherz.guidebook.guidebook.client.BookRendering;
 import dev.gigaherz.guidebook.guidebook.drawing.VisualElement;
 import dev.gigaherz.guidebook.guidebook.drawing.VisualImage;
 import dev.gigaherz.guidebook.guidebook.util.AttributeGetter;
@@ -29,16 +30,27 @@ public class ElementImage extends ElementInline
         super(isFirstElement, isLastElement);
     }
 
+    private float getVisualScale()
+    {
+        int width = (w > 0 ? w : tw);
+        int height = (h > 0 ? h : th);
+
+        // Prevent the image from overflowing the page
+        float scaleFit = Math.min(BookRendering.DEFAULT_PAGE_WIDTH / (float)width,
+                BookRendering.DEFAULT_PAGE_HEIGHT / (float)height);
+        return Math.min(scale, scaleFit);
+    }
+
     private Size getVisualSize()
     {
-        int width = (int) ((w > 0 ? w : tw) * scale);
-        int height = (int) ((h > 0 ? h : th) * scale);
+        int width = (int) ((w > 0 ? w : tw) * getVisualScale());
+        int height = (int) ((h > 0 ? h : th) * getVisualScale());
         return new Size(width, height);
     }
 
     private VisualImage getVisual()
     {
-        return new VisualImage(getVisualSize(), position, baseline, verticalAlignment, textureLocation, tx, ty, tw, th, (w > 0 ? w : tw), (h > 0 ? h : th), scale);
+        return new VisualImage(getVisualSize(), position, baseline, verticalAlignment, textureLocation, tx, ty, tw, th, (w > 0 ? w : tw), (h > 0 ? h : th), getVisualScale());
     }
 
     @Override

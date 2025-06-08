@@ -43,6 +43,8 @@ public class BookRendering implements IBookGraphics
     public static final int DEFAULT_BOTTOM_MARGIN = 16;
     public static final int DEFAULT_BOOK_WIDTH = 308 + DEFAULT_OUTER_MARGIN*2;
     public static final int DEFAULT_BOOK_HEIGHT = 192 + DEFAULT_TOP_MARGIN + DEFAULT_BOTTOM_MARGIN;
+    public static final int DEFAULT_PAGE_WIDTH = DEFAULT_BOOK_WIDTH / 2 - DEFAULT_INNER_MARGIN - DEFAULT_OUTER_MARGIN;
+    public static final int DEFAULT_PAGE_HEIGHT = DEFAULT_BOOK_HEIGHT - DEFAULT_TOP_MARGIN - DEFAULT_BOTTOM_MARGIN;
     public static final int BOOK_SCALE_MARGIN = 0;
 
     private final Minecraft mc = Minecraft.getInstance();
@@ -203,6 +205,8 @@ public class BookRendering implements IBookGraphics
             this.outerMargin = (int) (DEFAULT_OUTER_MARGIN / fontSize);
             this.topMargin = (int) (DEFAULT_TOP_MARGIN / fontSize);
             this.bottomMargin = (int) (DEFAULT_BOTTOM_MARGIN / fontSize);
+            this.pageWidth = (int) (DEFAULT_PAGE_WIDTH / fontSize);
+            this.pageHeight = (int) (DEFAULT_PAGE_HEIGHT / fontSize);
         }
         else
         {
@@ -216,10 +220,9 @@ public class BookRendering implements IBookGraphics
             this.outerMargin = DEFAULT_OUTER_MARGIN;
             this.topMargin = DEFAULT_TOP_MARGIN;
             this.bottomMargin = DEFAULT_BOTTOM_MARGIN;
+            this.pageWidth = DEFAULT_PAGE_WIDTH;
+            this.pageHeight = DEFAULT_PAGE_HEIGHT;
         }
-
-        this.pageWidth = this.bookWidth / 2 - this.innerMargin - this.outerMargin;
-        this.pageHeight = this.bookHeight - this.topMargin - this.bottomMargin;
 
         return !epsilonEquals(scalingFactor, oldScale);
     }
