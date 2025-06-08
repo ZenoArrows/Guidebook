@@ -365,7 +365,7 @@ public class BookDocument
     {
         return includeCache.computeIfAbsent(id, resLoc -> {
             // Prevents loading includes from config folder if the book was found in resource packs.
-            if (context.loadedFromConfigFolder() && resLoc.getNamespace().equals("gbook"))
+            if (context.loadedFromConfigFolder() && resLoc.getNamespace().equals(GuidebookMod.MODID))
             {
                 File booksFolder = BookRegistry.getBooksFolder();
                 File file = new File(booksFolder, resLoc.getPath());

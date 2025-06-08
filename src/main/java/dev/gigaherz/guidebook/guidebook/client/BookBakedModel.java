@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import dev.gigaherz.guidebook.GuidebookMod;
 import dev.gigaherz.guidebook.guidebook.BookRegistry;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.renderer.block.model.*;
@@ -27,7 +28,7 @@ import java.util.Map;
 
 public class BookBakedModel implements BakedModel
 {
-    public static final ResourceLocation LOCATION_COVERS = ResourceLocation.fromNamespaceAndPath("gbook", "textures/atlas/covers.png");
+    public static final ResourceLocation LOCATION_COVERS = ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID, "textures/atlas/covers.png");
 
     private final boolean isSideLit;
     private final ItemTransforms cameraTransforms;
@@ -131,8 +132,8 @@ public class BookBakedModel implements BakedModel
         {
             baseModel.resolveDependencies(resolver);
 
-            ResourceLocation paper = ResourceLocation.fromNamespaceAndPath("gbook", "misc/paper");
-            ResourceLocation coverBase = ResourceLocation.fromNamespaceAndPath("gbook", "misc/cover");
+            ResourceLocation paper = ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID, "misc/paper");
+            ResourceLocation coverBase = ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID, "misc/cover");
             BookRegistry.getLoadedBooks().forEach((resourceLocation, bookDocument) -> {
                 bookModels.computeIfAbsent(resourceLocation, (loc) -> {
                     ResourceLocation bookModel = bookDocument.getModelStandalone();

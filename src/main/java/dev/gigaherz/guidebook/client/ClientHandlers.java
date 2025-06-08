@@ -82,7 +82,7 @@ public class ClientHandlers
 
         @SubscribeEvent
         public static void onRegisterMaterialAtlases(RegisterMaterialAtlasesEvent event) {
-            event.register(BookBakedModel.LOCATION_COVERS, ResourceLocation.fromNamespaceAndPath("gbook", "covers"));
+            event.register(BookBakedModel.LOCATION_COVERS, ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID, "covers"));
         }
 
         @SubscribeEvent
@@ -116,7 +116,7 @@ public class ClientHandlers
 
     private static class CustomRenderTypes extends RenderType
     {
-        public static final ResourceLocation BRIGHT_SOLID_SHADER_LOCATION = ResourceLocation.fromNamespaceAndPath("gbook", "core/rendertype_bright_solid");
+        public static final ResourceLocation BRIGHT_SOLID_SHADER_LOCATION = ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID, "core/rendertype_bright_solid");
 
         public static final ShaderProgram BRIGHT_SOLID_SHADER = new ShaderProgram(BRIGHT_SOLID_SHADER_LOCATION, DefaultVertexFormat.NEW_ENTITY, ShaderDefines.EMPTY);
 

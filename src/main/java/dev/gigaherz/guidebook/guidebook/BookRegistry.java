@@ -64,7 +64,7 @@ public class BookRegistry
 
     static
     {
-        registerBook(ResourceLocation.fromNamespaceAndPath("gbook","xml/guidebook.xml"));
+        registerBook(ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID,"xml/guidebook.xml"));
     }
 
     @Nullable
