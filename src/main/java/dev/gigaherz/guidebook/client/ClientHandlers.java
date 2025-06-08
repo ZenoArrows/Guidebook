@@ -20,6 +20,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.resources.VanillaClientListeners;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -33,8 +34,6 @@ public class ClientHandlers
         AdvancementCondition.register();
         /*if (ModList.get().isLoaded("gamestages"))
             GameStageCondition.register();*/
-
-        BookRegistry.initClientResourceListener((ReloadableResourceManager) Minecraft.getInstance().getResourceManager());
     }
 
     @EventBusSubscriber(value = Dist.CLIENT, modid = GuidebookMod.MODID, bus = EventBusSubscriber.Bus.MOD)
@@ -89,6 +88,14 @@ public class ClientHandlers
         @SubscribeEvent
         static void onRegisterSpriteSourceTypes(RegisterSpriteSourceTypesEvent event) {
             event.register(CoverLister.ID, CoverLister.TYPE);
+        }
+
+        @SubscribeEvent
+        static void onRegisterReloadListener(AddClientReloadListenersEvent event) {
+            ResourceLocation loc = ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID, "books");
+            event.addListener(loc, BookRegistry::onResourceReload);
+            event.addDependency(VanillaClientListeners.LANGUAGE, loc);
+            event.addDependency(loc, VanillaClientListeners.MODELS);
         }
     }
 

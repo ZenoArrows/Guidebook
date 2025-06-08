@@ -31,6 +31,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,7 +49,7 @@ public class BookRegistry
     {
         if (!booksLoaded)
         {
-            parseAllBooks(Minecraft.getInstance().getResourceManager());
+            return Collections.emptyMap();
         }
         return Collections.unmodifiableMap(LOADED_BOOKS);
     }
@@ -392,11 +394,9 @@ public class BookRegistry
         return getLoadedBooks().values().stream().map(BookDocument::getCover).filter(Objects::nonNull).flatMap(Collection::stream).distinct();
     }
 
-    public static void initClientResourceListener(ReloadableResourceManager clientResourceManager)
+    public static CompletableFuture<Void> onResourceReload(PreparableReloadListener.PreparationBarrier stage, ResourceManager resourceManager, Executor asyncExecutor, Executor syncExecutor)
     {
-        clientResourceManager.registerReloadListener((ResourceManagerReloadListener) ((resourceManager) -> {
-            booksLoaded = false;
-        }));
+        return CompletableFuture.runAsync(() -> parseAllBooks(resourceManager), syncExecutor).thenCompose(stage::wait);
     }
 
     public static Collection<ResourceLocation> getBooksList()
