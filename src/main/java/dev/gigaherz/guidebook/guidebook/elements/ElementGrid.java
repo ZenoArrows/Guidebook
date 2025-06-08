@@ -14,8 +14,8 @@ import dev.gigaherz.guidebook.guidebook.util.AttributeGetter;
 import dev.gigaherz.guidebook.guidebook.util.Point;
 import dev.gigaherz.guidebook.guidebook.util.Rect;
 import dev.gigaherz.guidebook.guidebook.util.Size;
-import net.minecraft.client.resources.model.Material;
-import org.w3c.dom.NamedNodeMap;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -279,7 +279,7 @@ public class ElementGrid extends Element
     }
 
     @Override
-    public void findTextures(Set<Material> textures)
+    public void findTextures(Map<ResourceLocation, ReloadableTexture> textures)
     {
         for(var row : rows)
         {

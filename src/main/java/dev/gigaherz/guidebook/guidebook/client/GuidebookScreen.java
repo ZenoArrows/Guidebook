@@ -1,6 +1,5 @@
 package dev.gigaherz.guidebook.guidebook.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.gigaherz.guidebook.ConfigValues;
 import dev.gigaherz.guidebook.GuidebookMod;
 import dev.gigaherz.guidebook.guidebook.BookDocument;
@@ -14,9 +13,16 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GuidebookScreen extends Screen
 {
@@ -33,10 +39,12 @@ public class GuidebookScreen extends Screen
     private Button buttonHome;
 
     //private ItemModelShaper mesher = Minecraft.getInstance().getItemRenderer().getItemModelShaper();
-    //private TextureManager renderEngine = Minecraft.getInstance().getTextureManager();
+    private TextureManager renderEngine = Minecraft.getInstance().getTextureManager();
+    private ExecutorService textureLoader = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private BookRendering rendering;
     private IAnimatedBookBackground background;
+    public Map<ResourceLocation, ReloadableTexture> textures = new HashMap<>();
 
     public GuidebookScreen(ResourceLocation rendering)
     {
@@ -60,6 +68,14 @@ public class GuidebookScreen extends Screen
         if (rendering == null)
         {
             BookDocument theBook = BookRegistry.get(bookLocation);
+            theBook.findTextures(textures);
+            for (Map.Entry<ResourceLocation, ReloadableTexture> texture : textures.entrySet())
+            {
+                renderEngine.register(texture.getKey(), texture.getValue());
+                textureLoader.submit(() -> {
+                    renderEngine.registerAndLoad(texture.getKey(), texture.getValue());
+                });
+            }
             rendering = (BookRendering) theBook.getRendering();
 
             boolean conditions = theBook.reevaluateConditions(conditionContext);
@@ -133,7 +149,9 @@ public class GuidebookScreen extends Screen
         if (background.update())
         {
             minecraft.setScreen(null);
-            rendering.releaseTextures();
+            for (ResourceLocation location : textures.keySet())
+                renderEngine.release(location);
+            textures.clear();
         }
 
         updateButtonStates();

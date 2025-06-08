@@ -17,6 +17,7 @@ import dev.gigaherz.guidebook.guidebook.util.Point;
 import dev.gigaherz.guidebook.guidebook.util.Rect;
 import dev.gigaherz.guidebook.guidebook.util.Size;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -149,11 +150,8 @@ public class BookDocument
         return chapters.size();
     }
 
-    public void findTextures(Set<Material> textures)
+    public void findTextures(Map<ResourceLocation, ReloadableTexture> textures)
     {
-        if (bookCover != null)
-            textures.add(new Material(TextureAtlas.LOCATION_BLOCKS, bookCover));
-
         for (ChapterData chapter : chapters)
         {
             for (PageData page : chapter.sections)

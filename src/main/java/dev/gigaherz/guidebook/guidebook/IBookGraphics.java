@@ -71,6 +71,4 @@ public interface IBookGraphics
     void resetRendering(boolean contentsChanged);
 
     Level getWorld();
-
-    void releaseTextures();
 }

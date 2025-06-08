@@ -55,7 +55,6 @@ public class BookRendering implements IBookGraphics
     private GuidebookScreen gui;
 
     private BookDocument book;
-    private Map<ResourceLocation, AbstractTexture> textures = new HashMap();
 
     private boolean hasScale;
     private float scalingFactor;
@@ -111,15 +110,6 @@ public class BookRendering implements IBookGraphics
     public Level getWorld()
     {
         return Objects.requireNonNull(mc.level);
-    }
-
-    @Override
-    public void releaseTextures()
-    {
-        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-        for (ResourceLocation texture : textures.keySet())
-            textureManager.release(texture);
-        textures.clear();
     }
 
     @Override
@@ -754,34 +744,13 @@ public class BookRendering implements IBookGraphics
         if (w == 0) w = sw;
         if (h == 0) h = sh;
 
-        String path = loc.getPath().indexOf('.') > 0 ? loc.getPath() : loc.getPath() + ".png";
-        ResourceLocation locExpanded = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), "textures/" + path);
-
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-        boolean hires = sw > 256 || sh > 256;
-        AbstractTexture texture = textures.get(locExpanded);
-        if (texture == null)
-        {
-            if (hires)
-            {
-                MipmappedTexture mipmappedTexture = new MipmappedTexture(locExpanded);
-                textureManager.registerAndLoad(locExpanded, mipmappedTexture);
-                texture = mipmappedTexture;
-            }
-            else
-            {
-                texture = textureManager.getTexture(locExpanded);
-            }
-            textures.put(locExpanded, texture);
-        }
-        RenderSystem.setShaderTexture(0, texture.getId());
+        RenderSystem.setShaderTexture(0, loc);
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        drawFlexible(locExpanded, graphics.pose(), x, y, tx, ty, w, h, sw, sh, scale, hires);
+        drawFlexible(loc, graphics.pose(), x, y, tx, ty, w, h, sw, sh, scale, sw > 256 || sh > 256);
     }
 
     @Override

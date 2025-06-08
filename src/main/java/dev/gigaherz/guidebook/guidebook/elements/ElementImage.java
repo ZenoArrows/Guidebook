@@ -3,17 +3,19 @@ package dev.gigaherz.guidebook.guidebook.elements;
 import dev.gigaherz.guidebook.guidebook.IBookGraphics;
 import dev.gigaherz.guidebook.guidebook.ParsingContext;
 import dev.gigaherz.guidebook.guidebook.client.BookRendering;
+import dev.gigaherz.guidebook.guidebook.client.MipmappedTexture;
 import dev.gigaherz.guidebook.guidebook.drawing.VisualElement;
 import dev.gigaherz.guidebook.guidebook.drawing.VisualImage;
 import dev.gigaherz.guidebook.guidebook.util.AttributeGetter;
 import dev.gigaherz.guidebook.guidebook.util.Rect;
 import dev.gigaherz.guidebook.guidebook.util.Size;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
+import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public class ElementImage extends ElementInline
 {
@@ -71,10 +73,11 @@ public class ElementImage extends ElementInline
     }
 
     @Override
-    public void findTextures(Set<Material> textures)
+    public void findTextures(Map<ResourceLocation, ReloadableTexture> textures)
     {
-        // No need to require them, since they are used dynamically and not stitched.
-        //textures.add(textureLocation);
+        String path = textureLocation.getPath().indexOf('.') > 0 ? textureLocation.getPath() : textureLocation.getPath() + ".png";
+        ResourceLocation expandedLocation = ResourceLocation.fromNamespaceAndPath(textureLocation.getNamespace(), "textures/" + path);
+        textures.put(textureLocation, tw > 256 || th > 256 ? new MipmappedTexture(expandedLocation) : new SimpleTexture(expandedLocation));
     }
 
     @Override

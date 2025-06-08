@@ -13,13 +13,13 @@ import dev.gigaherz.guidebook.guidebook.util.AttributeGetter;
 import dev.gigaherz.guidebook.guidebook.util.Point;
 import dev.gigaherz.guidebook.guidebook.util.Rect;
 import dev.gigaherz.guidebook.guidebook.util.Size;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.w3c.dom.NodeList;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ElementPanel extends Element
@@ -187,7 +187,7 @@ public class ElementPanel extends Element
     }
 
     @Override
-    public void findTextures(Set<Material> textures)
+    public void findTextures(Map<ResourceLocation, ReloadableTexture> textures)
     {
         for (Element child : innerElements)
         {

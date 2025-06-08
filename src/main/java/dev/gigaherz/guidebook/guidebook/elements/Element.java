@@ -8,8 +8,8 @@ import dev.gigaherz.guidebook.guidebook.templates.TemplateDefinition;
 import dev.gigaherz.guidebook.guidebook.util.AttributeGetter;
 import dev.gigaherz.guidebook.guidebook.util.Point;
 import dev.gigaherz.guidebook.guidebook.util.Rect;
-import net.minecraft.client.resources.model.Material;
-import org.w3c.dom.NamedNodeMap;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -91,7 +90,7 @@ public abstract class Element
 
     public abstract int reflow(List<VisualElement> list, IBookGraphics nav, Rect bounds, Rect page);
 
-    public void findTextures(Set<Material> textures)
+    public void findTextures(Map<ResourceLocation, ReloadableTexture> textures)
     {
     }
 
