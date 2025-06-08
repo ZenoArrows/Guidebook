@@ -109,11 +109,6 @@ public class ClientHandlers
         return CustomRenderTypes.GUI_MIPMAPPED.apply(texture);
     }
 
-    public static RenderType layeredItemTranslucentMipped(ResourceLocation texture)
-    {
-        return CustomRenderTypes.LAYERED_ITEM_TRANSLUCENT_MIPPED.apply(texture);
-    }
-
     private static class CustomRenderTypes extends RenderType
     {
         public static final ResourceLocation BRIGHT_SOLID_SHADER_LOCATION = ResourceLocation.fromNamespaceAndPath(GuidebookMod.MODID, "core/rendertype_bright_solid");
@@ -153,19 +148,6 @@ public class ClientHandlers
                     .setDepthTestState(LEQUAL_DEPTH_TEST)
                     .createCompositeState(false);
             return create("gbook_gui_mipmapped", DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 786432, rendertype$state);
-        }
-
-        public static Function<ResourceLocation, RenderType> LAYERED_ITEM_TRANSLUCENT_MIPPED = Util.memoize(CustomRenderTypes::layeredItemTranslucentMipped);
-
-        private static RenderType layeredItemTranslucentMipped(ResourceLocation locationIn) {
-            RenderType.CompositeState rendertype$state = CompositeState.builder()
-                    .setShaderState(RenderType.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-                    .setTextureState(new RenderStateShard.TextureStateShard(locationIn, TriState.DEFAULT, true))
-                    .setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
-                    .setLightmapState(RenderType.LIGHTMAP)
-                    .setOverlayState(RenderType.OVERLAY)
-                    .createCompositeState(true);
-            return RenderType.create("gbook_item_entity_translucent_mipped", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, true, rendertype$state);
         }
     }
 }
