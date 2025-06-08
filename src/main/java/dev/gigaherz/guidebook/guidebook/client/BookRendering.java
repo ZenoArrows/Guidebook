@@ -740,7 +740,8 @@ public class BookRendering implements IBookGraphics
         if (w == 0) w = sw;
         if (h == 0) h = sh;
 
-        ResourceLocation locExpanded = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), "textures/" + loc.getPath() + ".png");
+        String path = loc.getPath().indexOf('.') > 0 ? loc.getPath() : loc.getPath() + ".png";
+        ResourceLocation locExpanded = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), "textures/" + path);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, locExpanded);
