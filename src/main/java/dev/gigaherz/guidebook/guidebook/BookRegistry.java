@@ -10,6 +10,7 @@ import dev.gigaherz.guidebook.GuidebookMod;
 import net.minecraft.FileUtil;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,8 @@ import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.*;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -396,7 +399,12 @@ public class BookRegistry
 
     public static CompletableFuture<Void> onResourceReload(PreparableReloadListener.PreparationBarrier stage, ResourceManager resourceManager, Executor asyncExecutor, Executor syncExecutor)
     {
-        return CompletableFuture.runAsync(() -> parseAllBooks(resourceManager), syncExecutor).thenCompose(stage::wait);
+        var job = CompletableFuture.runAsync(() -> parseAllBooks(resourceManager), syncExecutor);
+        Objects.requireNonNull(stage);
+        return job.thenCompose(stage::wait).thenRunAsync(() -> {
+            if (CreativeModeTabs.CACHED_PARAMETERS != null)
+                GuidebookMod.GUIDEBOOKS.get().buildContents(CreativeModeTabs.CACHED_PARAMETERS);
+        }, syncExecutor);
     }
 
     public static Collection<ResourceLocation> getBooksList()
