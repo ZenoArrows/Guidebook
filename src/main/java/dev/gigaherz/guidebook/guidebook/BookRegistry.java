@@ -90,6 +90,8 @@ public class BookRegistry
             try
             {
                 List<Resource> resources = manager.getResourceStack(ResourceLocation.fromNamespaceAndPath(domain, "books.json"));
+                if (resources.isEmpty())
+                    throw new FileNotFoundException();
 
                 for (Resource res : resources)
                 {
@@ -98,7 +100,7 @@ public class BookRegistry
             }
             catch (FileNotFoundException e)
             {
-                // IGNORE, it just means nothing was found
+                toLoad.addAll(manager.listResources("books", (ResourceLocation loc) -> loc.getPath().endsWith(".xml")).keySet());
             }
             catch (IOException e)
             {
